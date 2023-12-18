@@ -1,9 +1,11 @@
+/// Represents a hostel in the hostel management application.
 class Hostel {
     String name;
     String imageUrl;
     int studentCount;
     String warden;
 
+    /// Constructs a [Hostel] object with the given parameters.
     Hostel({
       required this.name,
       required this.imageUrl,
@@ -11,6 +13,7 @@ class Hostel {
       required this.warden
     });
 
+    /// Constructs a [Hostel] object from a JSON object.
     factory Hostel.fromJson(json) {
       return Hostel(
         name: json['Name'],
@@ -20,6 +23,7 @@ class Hostel {
       );
     }
 
+    /// Converts the [Hostel] object to a JSON object.
     Map<String, dynamic> toJson() {
         return {
           'Name': name,

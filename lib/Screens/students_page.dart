@@ -17,7 +17,11 @@ class _StudentsPageState extends State<StudentsPage> {
     return Scaffold(
       body: Column(
         children: [
-          Image.asset('assets/images/HostelManagementSystem.webp', height: 200),
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(175)),
+            child: Image.asset('assets/images/students_banner.webp',
+                height: 200, fit: BoxFit.cover, color: Colors.white),
+          ),
         ],
       ),
     );

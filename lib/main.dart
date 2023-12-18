@@ -5,6 +5,8 @@ import 'package:hostel_management_application/Screens/students_page.dart';
 import 'Screens/home_page.dart';
 import 'firebase_options.dart';
 
+/// The main entry point of the application.
+/// Initializes Firebase and runs the [MainApp] widget.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -13,13 +15,17 @@ void main() async {
   runApp(const MainApp());
 }
 
+/// The root widget of the application.
+/// Manages the state of the bottom navigation bar and the page view.
 class MainApp extends StatefulWidget {
   const MainApp({Key? key}) : super(key: key);
 
   @override
-  _MainAppState createState() => _MainAppState();
+  State<MainApp> createState() => _MainAppState();
 }
 
+/// The state of the [MainApp] widget.
+/// Manages the current index of the bottom navigation bar and the page controller.
 class _MainAppState extends State<MainApp> {
   int _currentIndex = 0;
   final PageController _pageController = PageController();
@@ -51,7 +57,7 @@ class _MainAppState extends State<MainApp> {
           currentIndex: _currentIndex,
           onTap: (index) {
             _pageController.animateToPage(index,
-                duration: Duration(milliseconds: 200), curve: Curves.easeIn);
+                duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
           },
           items: const [
             BottomNavigationBarItem(

@@ -27,8 +27,12 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset('assets/images/HostelManagementSystem.webp',
-                  height: 200),
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(175)),
+                child: Image.asset('assets/images/hostels_banner.webp',
+                    height: 200, fit: BoxFit.cover, color: Colors.white),
+              ),
               const SizedBox(height: 64),
               Expanded(
                 child: FutureBuilder<List<Hostel>>(
@@ -62,28 +66,8 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const StudentsPage(),
-            transitionDuration: const Duration (milliseconds: 500),
-            // reverseTransitionDuration: const Duration(milliseconds: 2000) ,
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              var screenSize = MediaQuery.of(context).size;
-              return ClipPath(
-                clipper: CircleRevealClipper(
-                  radius: animation
-                      .drive(Tween(begin: 0.0, end: screenSize.height * 1.5))
-                      .value,
-                  center: Offset(screenSize.width, screenSize.height/2),
-                ),
-                child: child,
-              );
-            },
-          ),
-        ),
+        onTap: () =>
+            Navigator.push(context, transitionPageRoute(const StudentsPage())),
         child: Card(
           elevation: 4,
           shape: RoundedRectangleBorder(
