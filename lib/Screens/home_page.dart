@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:hostel_management_application/database.dart';
 
+import '../Components/circle_reveal_clipper.dart';
+import '../database.dart';
 import '../Models/hostel_model.dart';
+import '../Screens/students_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -13,38 +14,44 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final DatabaseService dbService = DatabaseService();
+  late var hostels = dbService.getHostels();
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: RefreshIndicator.adaptive(
-        onRefresh: () async => setState(() { }),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/HotelManagementSystem.webp', height: 200),
-            const SizedBox(height: 64),
-            Expanded(
-              child: FutureBuilder<List<DocumentSnapshot<Object?>>>(
-                future: dbService.getHostels(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    final hostels = snapshot.data!.map((e) => Hostel.fromJson(e.data())).toList();
-                    return ListView.builder(
-                      itemCount: hostels.length,
-                      itemBuilder: (context, index) {
-                        return hostelCard(hostels[index]);
-                      },
-                    );
-                  }
-                },
+    return Scaffold(
+      body: Center(
+        child: RefreshIndicator.adaptive(
+          onRefresh: () async => setState(() {
+            hostels = dbService.getHostels();
+          }),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/HostelManagementSystem.webp',
+                  height: 200),
+              const SizedBox(height: 64),
+              Expanded(
+                child: FutureBuilder<List<Hostel>>(
+                  future: hostels,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      final hostels = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: hostels.length,
+                        itemBuilder: (context, index) {
+                          return hostelCard(hostels[index]);
+                        },
+                      );
+                    }
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -55,7 +62,28 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
-        onTap: () => debugPrint(h.name),
+        onTap: () => Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const StudentsPage(),
+            transitionDuration: const Duration (milliseconds: 500),
+            // reverseTransitionDuration: const Duration(milliseconds: 2000) ,
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              var screenSize = MediaQuery.of(context).size;
+              return ClipPath(
+                clipper: CircleRevealClipper(
+                  radius: animation
+                      .drive(Tween(begin: 0.0, end: screenSize.height * 1.5))
+                      .value,
+                  center: Offset(screenSize.width, screenSize.height/2),
+                ),
+                child: child,
+              );
+            },
+          ),
+        ),
         child: Card(
           elevation: 4,
           shape: RoundedRectangleBorder(
@@ -95,7 +123,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const StudentsPage())),
                 icon: const Icon(Icons.arrow_forward_ios, size: 36),
                 tooltip: 'Manage',
               ),
