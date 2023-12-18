@@ -6,7 +6,7 @@ import '../Models/hostel_model.dart';
 import '../Screens/students_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -27,13 +27,9 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(175)),
-                child: Image.asset('assets/images/hostels_banner.webp',
-                    height: 200, fit: BoxFit.cover, color: Colors.white),
-              ),
-              const SizedBox(height: 64),
+              Image.asset('assets/images/hostels_banner.webp',
+                  height: 200, fit: BoxFit.cover),
+              const SizedBox(height: 48),
               Expanded(
                 child: FutureBuilder<List<Hostel>>(
                   future: hostels,

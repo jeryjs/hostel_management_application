@@ -15,14 +15,14 @@ class _StudentsPageState extends State<StudentsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(175)),
-            child: Image.asset('assets/images/students_banner.webp',
-                height: 200, fit: BoxFit.cover, color: Colors.white),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          children: [
+            Image.asset('assets/images/students_banner.webp',
+                height: 200, fit: BoxFit.cover),
+            const SizedBox(height: 48),
+          ],
+        ),
       ),
     );
   }
