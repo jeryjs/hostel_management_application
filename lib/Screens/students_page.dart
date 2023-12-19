@@ -24,13 +24,11 @@ class _StudentsPageState extends State<StudentsPage> {
   late var students = refreshStudents();
 
   refreshStudents() {
-      if (widget.hostel != null) {
-        debugPrint('Hostel: ${widget.hostel!.name}');
-        return dbService.getStudentsByHostel(widget.hostel!);
-      } else {
-        debugPrint('Hostel: \$');
-        return dbService.getStudents();
-      }
+    if (widget.hostel != null) {
+      return dbService.getStudentsByHostel(widget.hostel!);
+    } else {
+      return dbService.getStudents();
+    }
   }
 
   @override
@@ -38,7 +36,9 @@ class _StudentsPageState extends State<StudentsPage> {
     return Scaffold(
       body: Center(
         child: RefreshIndicator.adaptive(
-          onRefresh: () async => setState(()=>refreshStudents()),
+          onRefresh: () async => setState(() {
+            students = refreshStudents();
+          }),
           child: Column(
             children: [
               Image.asset('assets/images/students_banner.webp',
@@ -52,7 +52,8 @@ class _StudentsPageState extends State<StudentsPage> {
                       return ListView.builder(
                         itemCount: 5,
                         itemBuilder: (context, index) {
-                          return CardLoading(height: 120, child: studentCard(Student.empty()));
+                          return CardLoading(
+                              height: 120, child: studentCard(Student.empty()));
                         },
                       );
                     } else if (snapshot.hasError) {
@@ -100,13 +101,13 @@ class _StudentsPageState extends State<StudentsPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
-                  [
-                    Icons.person,
-                    Icons.person_2,
-                    Icons.person_3,
-                    Icons.person_4
-                  ][Random().nextInt(4)],
-                  size: 72),
+                    [
+                      Icons.person,
+                      Icons.person_2,
+                      Icons.person_3,
+                      Icons.person_4
+                    ][Random().nextInt(4)],
+                    size: 72),
               ),
               Expanded(
                 child: Column(
