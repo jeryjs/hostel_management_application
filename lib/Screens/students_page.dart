@@ -119,9 +119,23 @@ class _StudentsPageState extends State<StudentsPage> {
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () => showEditDialog(s),
-                icon: Icon(Icons.edit_outlined, size: 32),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12, right: 8),
+                    child: Row(children: [
+                      Icon(Icons.bed_outlined, size: 24),
+                      Text(s.room.toString(),
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                    ]),
+                  ),
+                  IconButton(
+                    onPressed: () => showEditDialog(s),
+                    icon: Icon(Icons.edit_outlined, size: 32),
+                    tooltip: 'Edit',
+                  ),
+                ],
               ),
             ],
           ),
@@ -135,14 +149,14 @@ class _StudentsPageState extends State<StudentsPage> {
 
     final id = s.id.isEmpty
         ? await (() async {
-            int maxId = 0;
+            int maxId = 1;
             for (Student student in await students) {
               if (student.id.startsWith('23')) {
-                int currentId = int.parse(student.id.substring(2));
+                int currentId = int.tryParse(student.id.substring(2)) ?? 0;
                 if (currentId > maxId) maxId = currentId;
               }
             }
-            return '23xxx${(maxId + 1).toString().padLeft(3, '0')}';
+            return '23xxx${(maxId + 1).toString().padLeft(2, '0')}';
           })()
         : s.id;
 
