@@ -1,3 +1,4 @@
+import 'package:card_loading/card_loading.dart';
 import 'package:flutter/material.dart';
 
 import '../Components/circle_reveal_clipper.dart';
@@ -35,7 +36,13 @@ class _HomePageState extends State<HomePage> {
                   future: hostels,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
+                      return ListView.builder(
+                        itemCount: 3,
+                        itemBuilder: (context, index) {
+                          return CardLoading(
+                              height: 160, child: hostelCard(Hostel.empty()));
+                        },
+                      );
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
@@ -102,12 +109,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const StudentsPage())),
-                icon: const Icon(Icons.arrow_forward_ios, size: 36),
-                tooltip: 'Manage',
-              ),
+              Icon(Icons.arrow_forward_ios, size: 40, color: clr.primary),
             ],
           ),
         ),

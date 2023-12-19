@@ -1,9 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
+import 'hostel_model.dart';
+
 /// Represents a student in the hostel management application.
 class Student {
   String name;
-  List<int> contact;
-  List<String> email;
-  dynamic hostel;
+  int contact;
+  String email;
+  DocumentReference hostel;
+  int room;
   String id;
 
   /// Constructs a new instance of the [Student] class.
@@ -14,6 +20,7 @@ class Student {
     required this.contact,
     required this.email,
     required this.hostel,
+    required this.room,
     required this.id,
   });
 
@@ -26,7 +33,19 @@ class Student {
       contact: json['contact'],
       email: json['email'],
       hostel: json['hostel'],
+      room: json['room'],
       id: json['id'],
+    );
+  }
+
+  factory Student.empty() {
+    return Student(
+      name: '',
+      contact: 0,
+      email: '',
+      hostel: FirebaseFirestore.instance.collection('Hostels').doc('Karakoram'),
+      room: 0,
+      id: '',
     );
   }
 
@@ -39,7 +58,30 @@ class Student {
       'contact': contact,
       'email': email,
       'hostel': hostel,
+      'room': room,
       'id': id,
     };
   }
+
+  /// Gets the [Hostel] object from the [hostel] reference.
+  /// 
+  /// Returns a [Hostel] object.
+  Future<Hostel> getHostel() async {
+    final doc = await hostel.get();
+    return Hostel.fromJson(doc.data()!);
+  }
+
+  /// Return a color representation of the [Hostel] object.
+    Color toColor() {
+      switch (hostel.id) {
+        case 'Himalaya':
+          return Colors.blue;
+        case 'Karakoram':
+          return Colors.green;
+        case 'Purvanchal':
+          return Colors.red;
+        default:
+          return Colors.black;
+      }
+    }
 }

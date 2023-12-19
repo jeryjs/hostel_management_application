@@ -62,7 +62,7 @@ class _MainAppState extends State<MainApp> {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Home',
+              label: 'Hostels',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.school),

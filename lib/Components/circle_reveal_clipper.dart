@@ -43,7 +43,7 @@ PageRouteBuilder transitionPageRoute(Widget screen) {
       return ClipPath(
         clipper: CircleRevealClipper(
           radius: animation.drive(Tween(begin: 0.0, end: screenSize.height * 1.5)).value,
-          center: Offset(screenSize.width, screenSize.height / 2),
+          center: Offset(screenSize.width/1.1, screenSize.height / 2),
         ),
         child: child,
       );

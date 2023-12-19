@@ -1,9 +1,13 @@
+import 'package:flutter/material.dart';
+
 /// Represents a hostel in the hostel management application.
 class Hostel {
     String name;
     String imageUrl;
     int studentCount;
     String warden;
+    
+    late Color colorCode;
 
     /// Constructs a [Hostel] object with the given parameters.
     Hostel({
@@ -23,6 +27,16 @@ class Hostel {
       );
     }
 
+    /// Constructs an empty [Hostel] object.
+    factory Hostel.empty() {
+      return Hostel(
+        name: '',
+        imageUrl: '',
+        studentCount: 0,
+        warden: '',
+      );
+    }
+
     /// Converts the [Hostel] object to a JSON object.
     Map<String, dynamic> toJson() {
         return {
@@ -31,5 +45,19 @@ class Hostel {
           'StudentCount': studentCount,
           'Warden': warden,
         };
+    }
+
+    /// Return a color representation of the [Hostel] object.
+    Color toColor() {
+      switch (name) {
+        case 'Himalaya':
+          return Colors.blue;
+        case 'Karakoram':
+          return Colors.green;
+        case 'Purvanchal':
+          return Colors.red;
+        default:
+          return Colors.black;
+      }
     }
 }
