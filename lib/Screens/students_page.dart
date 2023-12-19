@@ -6,11 +6,14 @@ import 'package:card_loading/card_loading.dart';
 import 'package:flutter/material.dart';
 
 import '../Components/circle_reveal_clipper.dart';
+import '../Models/hostel_model.dart';
 import '../Models/student_model.dart';
 import '../database.dart';
 
 class StudentsPage extends StatefulWidget {
-  const StudentsPage({super.key});
+  final Hostel? hostel;
+
+  const StudentsPage({this.hostel, super.key});
 
   @override
   State<StudentsPage> createState() => _StudentsPageState();
@@ -18,16 +21,24 @@ class StudentsPage extends StatefulWidget {
 
 class _StudentsPageState extends State<StudentsPage> {
   final DatabaseService dbService = DatabaseService();
-  late var students = dbService.getStudents();
+  late var students = refreshStudents();
+
+  refreshStudents() {
+      if (widget.hostel != null) {
+        debugPrint('Hostel: ${widget.hostel!.name}');
+        return dbService.getStudentsByHostel(widget.hostel!);
+      } else {
+        debugPrint('Hostel: \$');
+        return dbService.getStudents();
+      }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: RefreshIndicator.adaptive(
-          onRefresh: () async => setState(() {
-            students = dbService.getStudents();
-          }),
+          onRefresh: () async => setState(()=>refreshStudents()),
           child: Column(
             children: [
               Image.asset('assets/images/students_banner.webp',
@@ -78,6 +89,7 @@ class _StudentsPageState extends State<StudentsPage> {
         onTap: () =>
             Navigator.push(context, transitionPageRoute(const StudentsPage())),
         child: Card(
+          surfaceTintColor: s.toColor(),
           shadowColor: s.toColor(),
           elevation: 4,
           shape: RoundedRectangleBorder(

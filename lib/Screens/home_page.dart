@@ -70,8 +70,10 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () =>
-            Navigator.push(context, transitionPageRoute(const StudentsPage())),
+            Navigator.push(context, transitionPageRoute(StudentsPage(hostel: h))),
         child: Card(
+          surfaceTintColor: h.toColor(),
+          shadowColor: h.toColor(),
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),

@@ -7,8 +7,6 @@ class Hostel {
     int studentCount;
     String warden;
     
-    late Color colorCode;
-
     /// Constructs a [Hostel] object with the given parameters.
     Hostel({
       required this.name,

@@ -50,6 +50,16 @@ class DatabaseService {
     return studentList;
   }
 
+  /// Retrieves a list of all students from specific [Hostel].
+  ///
+  /// Returns a list of [Student] objects.
+  Future<List<Student>> getStudentsByHostel(Hostel hostel) async {
+    QuerySnapshot querySnapshot = await students.where('hostel', isEqualTo: hostels.doc(hostel.name)).get();
+    debugPrint('Fetched Students: ${querySnapshot.docs.length}');
+    List<Student> studentList = querySnapshot.docs.map((e) => Student.fromJson(e.data())).toList();
+    return studentList;
+  }
+
   /// Adds a new student to the database.
   ///
   /// [s] - The [Student] object to be added.
