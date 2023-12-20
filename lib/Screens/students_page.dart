@@ -87,8 +87,8 @@ class _StudentsPageState extends State<StudentsPage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
-        onTap: () =>
-            Navigator.push(context, transitionPageRoute(const StudentsPage())),
+        onTap: () => debugPrint(s.name),
+            // Navigator.push(context, transitionPageRoute(const StudentsPage())),
         child: Card(
           surfaceTintColor: s.toColor(),
           shadowColor: s.toColor(),
@@ -186,41 +186,40 @@ class _StudentsPageState extends State<StudentsPage> {
           content: SingleChildScrollView(
             child: Form(
               key: formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: nameCtrl,
-                    decoration: InputDecoration(labelText: 'Name'),
-                    validator: (v) => v!.isEmpty ? 'Enter a name' : null,
-                  ),
-                  TextFormField(
-                    controller: contactCtrl,
-                    decoration: InputDecoration(labelText: 'Contact'),
-                    validator: (v) => v!.isEmpty ? 'Enter a contact' : null,
-                  ),
-                  TextFormField(
-                    controller: emailCtrl,
-                    decoration: InputDecoration(labelText: 'Email'),
-                    validator: (v) => v!.isEmpty ? 'Enter an email' : null,
-                  ),
-                  DropdownButtonFormField(
-                    value: hostelCtrl.text,
-                    items: ['Himalaya', 'Karakoram', 'Purvanchal']
-                        .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                        .toList(),
-                    onChanged: (v) => hostelCtrl.text = v!,
-                    decoration: InputDecoration(labelText: 'Hostel'),
-                    validator: (v) =>
-                        v!.isEmpty ? 'Please select a hostel' : null,
-                  ),
-                  TextFormField(
-                    controller: roomCtrl,
-                    decoration: InputDecoration(labelText: 'Room'),
-                    validator: (v) =>
-                        v!.isEmpty || v == '0' ? 'Enter Room Number' : null,
-                  ),
-                ],
-              ),
+              child: Column(children: [
+                TextFormField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(labelText: 'Name'),
+                  validator: (v) => v!.isEmpty ? 'Enter a name' : null,
+                ),
+                TextFormField(
+                  controller: contactCtrl,
+                  decoration: InputDecoration(labelText: 'Contact'),
+                  validator: (v) =>
+                      v!.isEmpty || v == '0' ? 'Enter a contact' : null,
+                ),
+                TextFormField(
+                  controller: emailCtrl,
+                  decoration: InputDecoration(labelText: 'Email'),
+                  validator: (v) => v!.isEmpty ? 'Enter an email' : null,
+                ),
+                DropdownButtonFormField(
+                  value: hostelCtrl.text,
+                  items: ['Himalaya', 'Karakoram', 'Purvanchal']
+                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                      .toList(),
+                  onChanged: (v) => hostelCtrl.text = v!,
+                  decoration: InputDecoration(labelText: 'Hostel'),
+                  validator: (v) =>
+                      v!.isEmpty ? 'Please select a hostel' : null,
+                ),
+                TextFormField(
+                  controller: roomCtrl,
+                  decoration: InputDecoration(labelText: 'Room'),
+                  validator: (v) =>
+                      v!.isEmpty || v == '0' ? 'Enter Room Number' : null,
+                ),
+              ]),
             ),
           ),
           actions: [
@@ -242,6 +241,7 @@ class _StudentsPageState extends State<StudentsPage> {
                     id: id,
                   );
                   dbService.updateStudent(newStudent);
+                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pop();
                 }
               },
