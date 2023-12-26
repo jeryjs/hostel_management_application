@@ -1,3 +1,4 @@
+import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hostel_management_application/Screens/students_page.dart';
@@ -41,17 +42,20 @@ class _MainAppState extends State<MainApp> {
           title: const Text('Some University',
               style: TextStyle(fontFamily: 'inkfree')),
         ),
-        body: PageView(
-          controller: _pageController,
-          onPageChanged: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          children: const [
-            HomePage(),
-            StudentsPage(),
-          ],
+        body: DoubleBackToCloseApp(
+          snackBar: const SnackBar(content: Text('Press back again to close')),
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            children: const [
+              HomePage(),
+              StudentsPage(),
+            ],
+          ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
