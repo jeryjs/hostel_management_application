@@ -12,6 +12,9 @@ class Student {
   int room;
   String id;
 
+  late int year = _parseYear();
+  late int floor = _parseFloor();
+
   /// Constructs a new instance of the [Student] class.
   ///
   /// The [name], [contact], [email], [hostel], and [id] parameters are required.
@@ -84,4 +87,14 @@ class Student {
           return Colors.black;
       }
     }
+
+  /// parse the year of joining from the [id] of the student
+  int _parseYear() {
+    return 2000 + int.parse(id.substring(0,2));
+  }
+
+  /// parse the hostel floor from the [room] number of the student
+  int _parseFloor() {
+    return int.parse(room.toString().substring(0,1));
+  }
 }
