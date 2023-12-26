@@ -203,7 +203,7 @@ class _StudentsPageState extends State<StudentsPage> {
                 bottom: 20,
                 child: Center(
                     child: Icon(
-                        // Show a random icon for student image
+                      // Show a random icon for student image
                         [
                           Icons.person,
                           Icons.person_2,
@@ -345,12 +345,15 @@ class _StudentsPageState extends State<StudentsPage> {
                     name: nameCtrl.text,
                     contact: int.parse(contactCtrl.text),
                     email: emailCtrl.text,
-                    hostel:
-                        await dbService.getDocRef('Hostels/${hostelCtrl.text}'),
+                    hostel: await dbService.getDocRef('Hostels/${hostelCtrl.text}'),
                     room: int.parse(roomCtrl.text),
                     id: id,
                   );
-                  dbService.updateStudent(newStudent);
+                  if(s.id.isEmpty) {
+                    dbService.updateStudent(newStudent);
+                  } else {
+                    dbService.addStudent(newStudent);
+                  }
                   // ignore: use_build_context_synchronously
                   Navigator.of(context).pop();
                 }
