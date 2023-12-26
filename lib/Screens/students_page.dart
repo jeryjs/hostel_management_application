@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:card_loading/card_loading.dart';
 import 'package:flutter/material.dart';
 
-import '../Components/circle_reveal_clipper.dart';
 import '../Models/hostel_model.dart';
 import '../Models/student_model.dart';
 import '../database.dart';
@@ -33,6 +32,8 @@ class _StudentsPageState extends State<StudentsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isFromHostel = widget.hostel == null;
+
     return Scaffold(
       body: Center(
         child: RefreshIndicator.adaptive(
@@ -45,31 +46,7 @@ class _StudentsPageState extends State<StudentsPage> {
                   height: 200, fit: BoxFit.cover),
               const SizedBox(height: 48),
               Expanded(
-                child: FutureBuilder<List<Student>>(
-                  future: students,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return ListView.builder(
-                        itemCount: 5,
-                        itemBuilder: (context, index) {
-                          return CardLoading(
-                              height: 120, child: studentCard(Student.empty()));
-                        },
-                      );
-                    } else if (snapshot.hasError) {
-                      debugPrintStack();
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      final students = snapshot.data!;
-                      return ListView.builder(
-                        itemCount: students.length,
-                        itemBuilder: (context, index) {
-                          return studentCard(students[index]);
-                        },
-                      );
-                    }
-                  },
-                ),
+                child: isFromHostel ? _buildDefaultView() : _buildHostelView(),
               ),
             ],
           ),
@@ -82,13 +59,75 @@ class _StudentsPageState extends State<StudentsPage> {
     );
   }
 
-  Widget studentCard(Student s) {
+  // ignore: unused_element
+  Widget _buildDefaultView() {
+    return FutureBuilder<List<Student>>(
+      future: students,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return ListView.builder(
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return CardLoading(
+                  height: 120, child: linearStudentCard(Student.empty()));
+            },
+          );
+        } else if (snapshot.hasError) {
+          debugPrintStack();
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final students = snapshot.data!;
+          return ListView.builder(
+            itemCount: students.length,
+            itemBuilder: (context, index) {
+              return linearStudentCard(students[index]);
+            },
+          );
+        }
+      },
+    );
+  }
+
+  // ignore: unused_element
+  Widget _buildHostelView() {
+    return FutureBuilder<List<Student>>(
+      future: students,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return GridView.builder(
+            gridDelegate:
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return CardLoading(
+                  height: 120, child: verticalStudentCard(Student.empty()));
+            },
+          );
+        } else if (snapshot.hasError) {
+          debugPrintStack();
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final students = snapshot.data!;
+          return GridView.builder(
+            gridDelegate:
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+            itemCount: students.length,
+            itemBuilder: (context, index) {
+              return verticalStudentCard(students[index]);
+            },
+          );
+        }
+      },
+    );
+  }
+
+  Widget linearStudentCard(Student s) {
     final clr = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () => debugPrint(s.name),
-            // Navigator.push(context, transitionPageRoute(const StudentsPage())),
+        // Navigator.push(context, transitionPageRoute(const StudentsPage())),
         child: Card(
           surfaceTintColor: s.toColor(),
           shadowColor: s.toColor(),
@@ -101,6 +140,7 @@ class _StudentsPageState extends State<StudentsPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
+                    // Show a random icon for student image
                     [
                       Icons.person,
                       Icons.person_2,
@@ -136,6 +176,76 @@ class _StudentsPageState extends State<StudentsPage> {
                     tooltip: 'Edit',
                   ),
                 ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget verticalStudentCard(Student s) {
+    final clr = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () => debugPrint(s.name),
+        child: Card(
+          surfaceTintColor: s.toColor(),
+          shadowColor: s.toColor(),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                bottom: 20,
+                child: Center(
+                    child: Icon(
+                        // Show a random icon for student image
+                        [
+                          Icons.person,
+                          Icons.person_2,
+                          Icons.person_3,
+                          Icons.person_4
+                        ][Random().nextInt(4)],
+                        size: 150)),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, left: 8),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: clr.surface, width: 1),
+                          borderRadius: BorderRadius.circular(8),
+                          color: clr.onPrimary),
+                      child: Row(children: [
+                        Icon(Icons.bed_outlined, size: 18),
+                        Text(s.room.toString(),
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ]),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => showEditDialog(s),
+                    icon: Icon(Icons.edit_outlined, size: 28),
+                    tooltip: 'Edit',
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 125,
+                child: Column(
+                  children: [
+                    Text(s.name,
+                        style: TextStyle(fontSize: 16, color: clr.primary)),
+                    Text(s.id, style: TextStyle(color: clr.secondary)),
+                  ],
+                ),
               ),
             ],
           ),
