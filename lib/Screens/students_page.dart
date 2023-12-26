@@ -32,7 +32,7 @@ class _StudentsPageState extends State<StudentsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isFromHostel = widget.hostel == null;
+    final bool isMainPage = widget.hostel == null;
 
     return Scaffold(
       body: Center(
@@ -46,16 +46,18 @@ class _StudentsPageState extends State<StudentsPage> {
                   height: 200, fit: BoxFit.cover),
               const SizedBox(height: 48),
               Expanded(
-                child: isFromHostel ? _buildDefaultView() : _buildHostelView(),
+                child: isMainPage ? _buildDefaultView() : _buildHostelView(),
               ),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showEditDialog(),
-        child: const Icon(Icons.format_list_bulleted_add),
-      ),
+      floatingActionButton: isMainPage
+          ? FloatingActionButton(
+              onPressed: () => showEditDialog(),
+              child: const Icon(Icons.format_list_bulleted_add),
+            )
+          : null,
     );
   }
 
@@ -110,7 +112,7 @@ class _StudentsPageState extends State<StudentsPage> {
           final students = snapshot.data!;
           return GridView.builder(
             gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
             itemCount: students.length,
             itemBuilder: (context, index) {
               return verticalStudentCard(students[index]);
@@ -203,7 +205,7 @@ class _StudentsPageState extends State<StudentsPage> {
                 bottom: 20,
                 child: Center(
                     child: Icon(
-                      // Show a random icon for student image
+                        // Show a random icon for student image
                         [
                           Icons.person,
                           Icons.person_2,
@@ -256,17 +258,19 @@ class _StudentsPageState extends State<StudentsPage> {
 
   Future<void> showEditDialog([Student? student]) async {
     Student s = student ?? Student.empty();
+    final bool isNew = s.id.isEmpty;
 
-    final id = s.id.isEmpty
+    final id = isNew
         ? await (() async {
-            int maxId = 1;
+            int newId = 1;
             for (Student student in await students) {
               if (student.id.startsWith('23')) {
-                int currentId = int.tryParse(student.id.substring(2)) ?? 0;
-                if (currentId > maxId) maxId = currentId;
+                int currentId = int.parse(student.id.substring(5, 7));
+                debugPrint(currentId.toString());
+                if (currentId == newId) newId++;
               }
             }
-            return '23xxx${(maxId + 1).toString().padLeft(2, '0')}';
+            return '23xxx${(newId).toString().padLeft(2, '0')}';
           })()
         : s.id;
 
@@ -285,7 +289,7 @@ class _StudentsPageState extends State<StudentsPage> {
         return AlertDialog(
           title: Text.rich(
             TextSpan(
-              text: s.id.isEmpty ? 'Add Student ' : 'Edit Student ',
+              text: isNew ? 'Add Student ' : 'Edit Student ',
               children: [
                 TextSpan(
                     text: id,
@@ -341,21 +345,34 @@ class _StudentsPageState extends State<StudentsPage> {
               child: Text('Save'),
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Center(child: CircularProgressIndicator()),
+                      );
+                    },
+                  );
+
                   final newStudent = Student(
                     name: nameCtrl.text,
                     contact: int.parse(contactCtrl.text),
                     email: emailCtrl.text,
-                    hostel: await dbService.getDocRef('Hostels/${hostelCtrl.text}'),
+                    hostel:
+                        await dbService.getDocRef('Hostels/${hostelCtrl.text}'),
                     room: int.parse(roomCtrl.text),
                     id: id,
                   );
-                  if(s.id.isEmpty) {
-                    dbService.updateStudent(newStudent);
+
+                  if (isNew) {
+                    await dbService.addStudent(newStudent);
                   } else {
-                    dbService.addStudent(newStudent);
+                    await dbService.updateStudent(newStudent);
                   }
-                  // ignore: use_build_context_synchronously
-                  Navigator.of(context).pop();
+
+                  Navigator.of(context).pop(); // pop the progress dialog
+                  Navigator.of(context).pop(); // pop the edit dialog
                 }
               },
             ),
