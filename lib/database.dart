@@ -6,9 +6,9 @@ import 'Models/student_model.dart';
 
 /// A class that provides database operations for hostels and students.
 class DatabaseService {
-  final FirebaseFirestore fsInstance = FirebaseFirestore.instance;
-  late final hostels = fsInstance.collection('Hostels');
-  late final students = fsInstance.collection('Students');
+  final FirebaseFirestore db = FirebaseFirestore.instance;
+  late final hostels = db.collection('Hostels');
+  late final students = db.collection('Students');
 
   /// Retrieves a list of all hostels from the database.
   ///
@@ -45,7 +45,7 @@ class DatabaseService {
   /// Returns a list of [Student] objects.
   Future<List<Student>> getStudents() async {
     QuerySnapshot querySnapshot = await students.get();
-    debugPrint('Fetched Students: ${querySnapshot.docs.length}');
+    debugPrint('Fetched Students: ${querySnapshot.docs.length} [isFromCache: ${querySnapshot.metadata.isFromCache}]');
     List<Student> studentList = querySnapshot.docs.map((e) => Student.fromJson(e.data())).toList();
     return studentList;
   }
@@ -86,6 +86,6 @@ class DatabaseService {
   ///
   /// Returns a [DocumentReference] object.
   Future<DocumentReference> getDocRef(String path) async {
-    return fsInstance.doc(path);
+    return db.doc(path);
   }
 }

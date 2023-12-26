@@ -112,7 +112,7 @@ class _StudentsPageState extends State<StudentsPage> {
           final students = snapshot.data!;
           return GridView.builder(
             gridDelegate:
-            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
             itemCount: students.length,
             itemBuilder: (context, index) {
               return verticalStudentCard(students[index]);
@@ -192,65 +192,89 @@ class _StudentsPageState extends State<StudentsPage> {
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () => debugPrint(s.name),
-        child: Card(
-          surfaceTintColor: s.toColor(),
-          shadowColor: s.toColor(),
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                bottom: 20,
-                child: Center(
-                    child: Icon(
-                        // Show a random icon for student image
-                        [
-                          Icons.person,
-                          Icons.person_2,
-                          Icons.person_3,
-                          Icons.person_4
-                        ][Random().nextInt(4)],
-                        size: 150)),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final h = constraints.maxHeight;
+            final w = constraints.maxWidth;
+
+            return Card(
+              surfaceTintColor: s.toColor(),
+              shadowColor: s.toColor(),
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, left: 8),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: clr.surface, width: 1),
-                          borderRadius: BorderRadius.circular(8),
-                          color: clr.onPrimary),
-                      child: Row(children: [
-                        Icon(Icons.bed_outlined, size: 18),
-                        Text(s.room.toString(),
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ]),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => showEditDialog(s),
-                    icon: Icon(Icons.edit_outlined, size: 28),
-                    tooltip: 'Edit',
-                  ),
-                ],
-              ),
-              Positioned(
-                top: 125,
-                child: Column(
+              child: Stack(children: [
+                Icon(
+                  // Show a random icon for student image
+                  [
+                    Icons.person,
+                    Icons.person_2,
+                    Icons.person_3,
+                    Icons.person_4
+                  ][Random().nextInt(4)],
+                  size: h,
+                  color: clr.surface,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(s.name,
-                        style: TextStyle(fontSize: 16, color: clr.primary)),
-                    Text(s.id, style: TextStyle(color: clr.secondary)),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, left: 8),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: clr.surface, width: 1),
+                            borderRadius: BorderRadius.circular(8),
+                            color: clr.onPrimary),
+                        child: Row(children: [
+                          Icon(Icons.bed_outlined, size: w * 0.11),
+                          Text(s.room.toString(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: w * 0.09)),
+                        ]),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => showEditDialog(s),
+                      icon: Icon(Icons.edit_outlined, size: h * 0.15),
+                      tooltip: 'Edit',
+                    ),
                   ],
                 ),
-              ),
-            ],
-          ),
+                Positioned(
+                  top: h * 0.45,
+                  child: Container(
+                    height: h * 0.5,
+                    width: w * 0.95,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(24),
+                            bottomRight: Radius.circular(24)),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.black.withAlpha(1),
+                            Colors.black.withAlpha(120)
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        )),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(s.name,
+                            style: TextStyle(
+                                fontSize: w * 0.1, color: clr.primary)),
+                        Text(s.id,
+                            style: TextStyle(color: clr.primaryContainer)),
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
+            );
+          },
         ),
       ),
     );
