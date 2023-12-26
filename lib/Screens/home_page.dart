@@ -1,4 +1,5 @@
 import 'package:card_loading/card_loading.dart';
+import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 
 import '../Components/circle_reveal_clipper.dart';
@@ -69,8 +70,8 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
-        onTap: () =>
-            Navigator.push(context, transitionPageRoute(StudentsPage(hostel: h))),
+        onTap: () => Navigator.push(
+            context, transitionPageRoute(StudentsPage(hostel: h))),
         child: Card(
           surfaceTintColor: h.toColor(),
           shadowColor: h.toColor(),
@@ -82,9 +83,12 @@ class _HomePageState extends State<HomePage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage(h.imageUrl),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(40),
+                  child: FancyShimmerImage(
+                      width: 100, height: 100,
+                      imageUrl: h.imageUrl,
+                      errorWidget: const CardLoading(height: 100)),
                 ),
               ),
               const SizedBox(width: 10),

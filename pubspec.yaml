@@ -10,6 +10,7 @@ dependencies:
   bilions_ui: ^1.0.19
   card_loading: ^0.3.0
   cloud_firestore: ^4.13.5
+  fancy_shimmer_image: ^2.0.3
   firebase_analytics: ^10.7.4
   firebase_core: ^2.24.2
   flutter:
