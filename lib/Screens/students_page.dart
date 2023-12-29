@@ -97,9 +97,9 @@ class _StudentsPageState extends State<StudentsPage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return GridView.builder(
-            gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-            itemCount: 5,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: MediaQuery.of(context).size.width ~/ 160),
+            itemCount: 30,
             itemBuilder: (context, index) {
               return CardLoading(
                   height: 120, child: verticalStudentCard(Student.empty()));
@@ -110,12 +110,23 @@ class _StudentsPageState extends State<StudentsPage> {
           return Text('Error: ${snapshot.error}');
         } else {
           final students = snapshot.data!;
-          return GridView.builder(
-            gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-            itemCount: students.length,
+
+          // Group students by room number
+          final studentsMap = <int, List<Student>>{};
+          for (var student in students) {
+            if (studentsMap.containsKey(student.room)) {
+              studentsMap[student.room]!.add(student);
+            } else {
+              studentsMap[student.room] = [student];
+            }
+          }
+
+          return ListView.builder(
+            // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            //     crossAxisCount: MediaQuery.of(context).size.width ~/ 160),
+            itemCount: studentsMap.length,
             itemBuilder: (context, index) {
-              return verticalStudentCard(students[index]);
+              return buildRoomCard(studentsMap.values.toList()[index]);
             },
           );
         }
@@ -129,7 +140,6 @@ class _StudentsPageState extends State<StudentsPage> {
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () => debugPrint(s.name),
-        // Navigator.push(context, transitionPageRoute(const StudentsPage())),
         child: Card(
           surfaceTintColor: s.toColor(),
           shadowColor: s.toColor(),
@@ -280,6 +290,39 @@ class _StudentsPageState extends State<StudentsPage> {
     );
   }
 
+  Widget buildRoomCard(List<Student> l) {
+    return Card(
+      child: Container(
+        color: Colors.amber[200],
+        child: Row(
+          children: [
+            RotatedBox(
+              quarterTurns: -1,
+              child: Center(
+                child: Text(
+                  l[0].room.toString(),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                ),
+              ),
+            ),
+            Expanded(
+              child: SizedBox(
+                height: 150,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: l.length,
+                  itemBuilder: (context, i) {
+                    return verticalStudentCard(l[i]);
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> showEditDialog([Student? student]) async {
     Student s = student ?? Student.empty();
     final bool isNew = s.id.isEmpty;
@@ -288,13 +331,13 @@ class _StudentsPageState extends State<StudentsPage> {
         ? await (() async {
             int newId = 1;
             for (Student student in await students) {
-              if (student.id.startsWith('23')) {
+              if (student.id.startsWith('22')) {
                 int currentId = int.parse(student.id.substring(5, 7));
                 debugPrint(currentId.toString());
                 if (currentId == newId) newId++;
               }
             }
-            return '23xxx${(newId).toString().padLeft(2, '0')}';
+            return '22xxx${(newId).toString().padLeft(2, '0')}';
           })()
         : s.id;
 
@@ -374,7 +417,10 @@ class _StudentsPageState extends State<StudentsPage> {
                     barrierDismissible: false,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        content: Center(child: CircularProgressIndicator()),
+                        content: SizedBox(
+                            height: 32,
+                            width: 32,
+                            child: CircularProgressIndicator()),
                       );
                     },
                   );
@@ -382,7 +428,7 @@ class _StudentsPageState extends State<StudentsPage> {
                   final newStudent = Student(
                     name: nameCtrl.text,
                     contact: int.parse(contactCtrl.text),
-                    email: emailCtrl.text,
+                    email: emailCtrl.text.toLowerCase(),
                     hostel:
                         await dbService.getDocRef('Hostels/${hostelCtrl.text}'),
                     room: int.parse(roomCtrl.text),

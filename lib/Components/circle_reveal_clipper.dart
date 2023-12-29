@@ -36,13 +36,13 @@ class CircleRevealClipper extends CustomClipper<Path> {
 PageRouteBuilder transitionPageRoute(Widget screen) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => screen,
-    transitionDuration: const Duration(milliseconds: 500),
+    transitionDuration: const Duration(milliseconds: 800),
     // reverseTransitionDuration: const Duration(milliseconds: 2000),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var screenSize = MediaQuery.of(context).size;
       return ClipPath(
         clipper: CircleRevealClipper(
-          radius: animation.drive(Tween(begin: 0.0, end: screenSize.height * 1.5)).value,
+          radius: animation.drive(Tween(begin: 0.0, end: screenSize.height * 2.5)).value,
           center: Offset(screenSize.width/1.1, screenSize.height / 2),
         ),
         child: child,
