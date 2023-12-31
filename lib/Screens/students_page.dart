@@ -4,7 +4,10 @@ import 'dart:math';
 
 import 'package:card_loading/card_loading.dart';
 import 'package:flutter/material.dart';
+import 'package:hostel_management_application/Components/contact_card.dart';
+import 'package:hostel_management_application/Components/random_person_icon.dart';
 
+import '../Components/edit_student_dialog.dart';
 import '../Models/hostel_model.dart';
 import '../Models/student_model.dart';
 import '../database.dart';
@@ -54,7 +57,7 @@ class _StudentsPageState extends State<StudentsPage> {
       ),
       floatingActionButton: isMainPage
           ? FloatingActionButton(
-              onPressed: () => showEditDialog(),
+              onPressed: () => showEditStudentDialog(context),
               child: const Icon(Icons.format_list_bulleted_add),
             )
           : null,
@@ -121,12 +124,12 @@ class _StudentsPageState extends State<StudentsPage> {
             }
           }
 
-          return ListView.builder(
-            // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            //     crossAxisCount: MediaQuery.of(context).size.width ~/ 160),
-            itemCount: studentsMap.length,
+          return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: MediaQuery.of(context).size.width ~/ 160),
+            itemCount: students.length,
             itemBuilder: (context, index) {
-              return buildRoomCard(studentsMap.values.toList()[index]);
+              return verticalStudentCard(students[index]);
             },
           );
         }
@@ -139,7 +142,14 @@ class _StudentsPageState extends State<StudentsPage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
-        onTap: () => debugPrint(s.name),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return ContactCardDialog(student: s);
+            },
+          );
+        },
         child: Card(
           surfaceTintColor: s.toColor(),
           shadowColor: s.toColor(),
@@ -151,16 +161,7 @@ class _StudentsPageState extends State<StudentsPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                    // Show a random icon for student image
-                    [
-                      Icons.person,
-                      Icons.person_2,
-                      Icons.person_3,
-                      Icons.person_4
-                    ][Random().nextInt(4)],
-                    size: 72),
-              ),
+                child: RandomPersonIcon(size: 72, color: Colors.black,)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,7 +184,7 @@ class _StudentsPageState extends State<StudentsPage> {
                     ]),
                   ),
                   IconButton(
-                    onPressed: () => showEditDialog(s),
+                    onPressed: () => showEditStudentDialog(context, s),
                     icon: Icon(Icons.edit_outlined, size: 32),
                     tooltip: 'Edit',
                   ),
@@ -201,7 +202,14 @@ class _StudentsPageState extends State<StudentsPage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
-        onTap: () => debugPrint(s.name),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return ContactCardDialog(student: s);
+            },
+          );
+        },
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             final h = constraints.maxHeight;
@@ -215,17 +223,7 @@ class _StudentsPageState extends State<StudentsPage> {
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Stack(children: [
-                Icon(
-                  // Show a random icon for student image
-                  [
-                    Icons.person,
-                    Icons.person_2,
-                    Icons.person_3,
-                    Icons.person_4
-                  ][Random().nextInt(4)],
-                  size: h,
-                  color: clr.surface,
-                ),
+                RandomPersonIcon(size: h, color: clr.surface),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,7 +245,7 @@ class _StudentsPageState extends State<StudentsPage> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => showEditDialog(s),
+                      onPressed: () => showEditStudentDialog(context, s),
                       icon: Icon(Icons.edit_outlined, size: h * 0.15),
                       tooltip: 'Edit',
                     ),
@@ -320,135 +318,6 @@ class _StudentsPageState extends State<StudentsPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Future<void> showEditDialog([Student? student]) async {
-    Student s = student ?? Student.empty();
-    final bool isNew = s.id.isEmpty;
-
-    final id = isNew
-        ? await (() async {
-            int newId = 1;
-            for (Student student in await students) {
-              if (student.id.startsWith('22')) {
-                int currentId = int.parse(student.id.substring(5, 7));
-                debugPrint(currentId.toString());
-                if (currentId == newId) newId++;
-              }
-            }
-            return '22xxx${(newId).toString().padLeft(2, '0')}';
-          })()
-        : s.id;
-
-    final formKey = GlobalKey<FormState>();
-    final nameCtrl = TextEditingController(text: s.name);
-    final contactCtrl = TextEditingController(text: s.contact.toString());
-    final emailCtrl = TextEditingController(text: s.email);
-    final hostelCtrl = TextEditingController(text: s.hostel.id);
-    final roomCtrl = TextEditingController(text: s.room.toString());
-
-    // ignore: use_build_context_synchronously
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text.rich(
-            TextSpan(
-              text: isNew ? 'Add Student ' : 'Edit Student ',
-              children: [
-                TextSpan(
-                    text: id,
-                    style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic))
-              ],
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(children: [
-                TextFormField(
-                  controller: nameCtrl,
-                  decoration: InputDecoration(labelText: 'Name'),
-                  validator: (v) => v!.isEmpty ? 'Enter a name' : null,
-                ),
-                TextFormField(
-                  controller: contactCtrl,
-                  decoration: InputDecoration(labelText: 'Contact'),
-                  validator: (v) =>
-                      v!.isEmpty || v == '0' ? 'Enter a contact' : null,
-                ),
-                TextFormField(
-                  controller: emailCtrl,
-                  decoration: InputDecoration(labelText: 'Email'),
-                  validator: (v) => v!.isEmpty ? 'Enter an email' : null,
-                ),
-                DropdownButtonFormField(
-                  value: hostelCtrl.text,
-                  items: ['Himalaya', 'Karakoram', 'Purvanchal']
-                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                      .toList(),
-                  onChanged: (v) => hostelCtrl.text = v!,
-                  decoration: InputDecoration(labelText: 'Hostel'),
-                  validator: (v) =>
-                      v!.isEmpty ? 'Please select a hostel' : null,
-                ),
-                TextFormField(
-                  controller: roomCtrl,
-                  decoration: InputDecoration(labelText: 'Room'),
-                  validator: (v) =>
-                      v!.isEmpty || v == '0' ? 'Enter Room Number' : null,
-                ),
-              ]),
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: Text('Save'),
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        content: SizedBox(
-                            height: 32,
-                            width: 32,
-                            child: CircularProgressIndicator()),
-                      );
-                    },
-                  );
-
-                  final newStudent = Student(
-                    name: nameCtrl.text,
-                    contact: int.parse(contactCtrl.text),
-                    email: emailCtrl.text.toLowerCase(),
-                    hostel:
-                        await dbService.getDocRef('Hostels/${hostelCtrl.text}'),
-                    room: int.parse(roomCtrl.text),
-                    id: id,
-                  );
-
-                  if (isNew) {
-                    await dbService.addStudent(newStudent);
-                  } else {
-                    await dbService.updateStudent(newStudent);
-                  }
-
-                  Navigator.of(context).pop(); // pop the progress dialog
-                  Navigator.of(context).pop(); // pop the edit dialog
-                }
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
