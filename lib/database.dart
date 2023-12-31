@@ -15,7 +15,7 @@ class DatabaseService {
   /// Returns a list of [Hostel] objects.
   Future<List<Hostel>> getHostels() async {
     QuerySnapshot querySnapshot = await hostels.get();
-    debugPrint('Fetched Hostels: ${querySnapshot.docs.length}');
+    debugPrint('Fetched Hostels: ${querySnapshot.docs.length} [isFromCache: ${querySnapshot.metadata.isFromCache}]');
     List<Hostel> hostelList = querySnapshot.docs.map((e) => Hostel.fromJson(e.data())).toList();
     return hostelList;
   }
