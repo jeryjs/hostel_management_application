@@ -38,7 +38,7 @@ class _MainAppState extends State<MainApp> {
         appBar: AppBar(
           leading: Icon(Icons.location_on,
               color: Theme.of(context).colorScheme.primary, size: 28),
-          title: const Text('Some University',
+          title: const Text('Jain University',
               style: TextStyle(fontFamily: 'inkfree')),
         ),
         body: PageView(
@@ -57,7 +57,8 @@ class _MainAppState extends State<MainApp> {
           currentIndex: _currentIndex,
           onTap: (index) {
             _pageController.animateToPage(index,
-                duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeIn);
           },
           items: const [
             BottomNavigationBarItem(
