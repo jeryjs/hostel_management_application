@@ -1,6 +1,7 @@
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:hostel_management_application/Screens/chat_page.dart';
 import 'package:hostel_management_application/Screens/students_page.dart';
 
 import 'Screens/home_page.dart';
@@ -54,6 +55,7 @@ class _MainAppState extends State<MainApp> {
             children: const [
               HomePage(),
               StudentsPage(),
+              ChatPage(),
             ],
           ),
         ),
@@ -71,6 +73,10 @@ class _MainAppState extends State<MainApp> {
             BottomNavigationBarItem(
               icon: Icon(Icons.school),
               label: 'Students',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.chat),
+              label: 'Chats',
             ),
           ],
         ),
