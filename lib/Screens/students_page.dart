@@ -25,11 +25,11 @@ class _StudentsPageState extends State<StudentsPage> {
   late Future<List<Student>> students = refreshStudents();
   List<Student> filteredStudents = [];
 
-  refreshStudents() {
+  Future<List<Student>> refreshStudents([bool getFromCache = false]) {
     if (widget.hostel != null) {
-      return dbService.getStudentsByHostel(widget.hostel!);
+      return dbService.getStudentsByHostel(widget.hostel!, getFromCache);
     } else {
-      return dbService.getStudents();
+      return dbService.getStudents(getFromCache);
     }
   }
 
@@ -38,45 +38,66 @@ class _StudentsPageState extends State<StudentsPage> {
     final bool isMainPage = widget.hostel == null;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 270.0,
-            floating: false,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Image.asset('assets/images/students_banner.webp',
-                  fit: BoxFit.cover),
-            ),
-            bottom: PreferredSize(
-              preferredSize: Size.fromHeight(30),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    labelText: "Search",
-                    hintText: "Search",
-                    prefixIcon: Icon(Icons.search),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        searchController.clear();
-                        setState(() {
-                          students = refreshStudents();
+      body: RefreshIndicator.adaptive(
+        onRefresh: () async {
+          setState(() {
+            students = refreshStudents();
+          });
+        },
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 275,
+              floating: false,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Image.asset('assets/images/students_banner.webp',
+                    fit: BoxFit.cover),
+              ),
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(30),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      labelText: "Search",
+                      hintText: "Search",
+                      prefixIcon: Icon(Icons.search),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          searchController.clear();
+                          setState(() {
+                            students = refreshStudents(true);
+                          });
+                        },
+                        icon: Icon(Icons.clear),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                      ),
+                    ),
+                    onChanged: (v) {
+                      v = v.toLowerCase();
+                      setState(() {
+                        students = refreshStudents(true).then((studentList) {
+                          final filteredSet = studentList
+                              .where((s) =>
+                                  s.name.toLowerCase().contains(v) ||
+                                  s.id.toLowerCase().contains(v) ||
+                                  s.room.toString().contains(v))
+                              .toSet();
+                          return filteredSet.toList();
                         });
-                      },
-                      icon: Icon(Icons.clear),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                    ),
+                      });
+                    },
                   ),
                 ),
               ),
             ),
-          ),
-          if (isMainPage) _buildDefaultView() else _buildHostelView(),
-        ],
+            if (isMainPage) _buildDefaultView() else _buildHostelView(),
+          ],
+        ),
       ),
       floatingActionButton: isMainPage
           ? FloatingActionButton(

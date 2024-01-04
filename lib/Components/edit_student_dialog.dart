@@ -11,7 +11,7 @@ Future<void> showEditStudentDialog(BuildContext context, [Student? student]) asy
     final id = isNew
         ? await (() async {
             int newId = 1;
-            for (Student student in await dbService.getStudents()) {
+            for (Student student in await dbService.getStudents(true)) {
               if (student.id.startsWith('22')) {
                 int currentId = int.parse(student.id.substring(5, 7));
                 debugPrint(currentId.toString());
