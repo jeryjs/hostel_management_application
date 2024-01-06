@@ -13,7 +13,10 @@ class DatabaseService {
   /// Retrieves a list of all hostels from the database.
   ///
   /// Returns a list of [Hostel] objects.
-  Future<List<Hostel>> getHostels() async {
+  Future<List<Hostel>> getHostels([bool getFromCache = false]) async {
+    getFromCache
+      ? db.disableNetwork()
+      : db.enableNetwork();
     QuerySnapshot querySnapshot = await hostels.get();
     debugPrint('Fetched Hostels: ${querySnapshot.docs.length} [isFromCache: ${querySnapshot.metadata.isFromCache}]');
     List<Hostel> hostelList = querySnapshot.docs.map((e) => Hostel.fromJson(e.data())).toList();
@@ -43,7 +46,10 @@ class DatabaseService {
   /// Retrieves a list of all students from the database.
   ///
   /// Returns a list of [Student] objects.
-  Future<List<Student>> getStudents() async {
+  Future<List<Student>> getStudents([bool getFromCache = false]) async {
+    getFromCache
+      ? db.disableNetwork()
+      : db.enableNetwork();
     QuerySnapshot querySnapshot = await students.get();
     debugPrint('Fetched Students: ${querySnapshot.docs.length} [isFromCache: ${querySnapshot.metadata.isFromCache}]');
     List<Student> studentList = querySnapshot.docs.map((e) => Student.fromJson(e.data())).toList();
@@ -53,7 +59,10 @@ class DatabaseService {
   /// Retrieves a list of all students from specific [Hostel].
   ///
   /// Returns a list of [Student] objects.
-  Future<List<Student>> getStudentsByHostel(Hostel hostel) async {
+  Future<List<Student>> getStudentsByHostel(Hostel hostel, [bool getFromCache = false]) async {
+    getFromCache
+      ? db.disableNetwork()
+      : db.enableNetwork();
     QuerySnapshot querySnapshot = await students.where('hostel', isEqualTo: hostels.doc(hostel.name)).get();
     debugPrint('Fetched Students: ${querySnapshot.docs.length}');
     List<Student> studentList = querySnapshot.docs.map((e) => Student.fromJson(e.data())).toList();

@@ -1,7 +1,5 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:math';
-
 import 'package:card_loading/card_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:hostel_management_application/Components/contact_card.dart';
@@ -23,13 +21,15 @@ class StudentsPage extends StatefulWidget {
 
 class _StudentsPageState extends State<StudentsPage> {
   final DatabaseService dbService = DatabaseService();
-  late var students = refreshStudents();
+  final searchController = TextEditingController();
+  late Future<List<Student>> students = refreshStudents();
+  List<Student> filteredStudents = [];
 
-  refreshStudents() {
+  Future<List<Student>> refreshStudents([bool getFromCache = false]) {
     if (widget.hostel != null) {
-      return dbService.getStudentsByHostel(widget.hostel!);
+      return dbService.getStudentsByHostel(widget.hostel!, getFromCache);
     } else {
-      return dbService.getStudents();
+      return dbService.getStudents(getFromCache);
     }
   }
 
@@ -38,21 +38,65 @@ class _StudentsPageState extends State<StudentsPage> {
     final bool isMainPage = widget.hostel == null;
 
     return Scaffold(
-      body: Center(
-        child: RefreshIndicator.adaptive(
-          onRefresh: () async => setState(() {
+      body: RefreshIndicator.adaptive(
+        onRefresh: () async {
+          setState(() {
             students = refreshStudents();
-          }),
-          child: Column(
-            children: [
-              Image.asset('assets/images/students_banner.webp',
-                  height: 200, fit: BoxFit.cover),
-              const SizedBox(height: 48),
-              Expanded(
-                child: isMainPage ? _buildDefaultView() : _buildHostelView(),
+          });
+        },
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 275,
+              floating: false,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Image.asset('assets/images/students_banner.webp',
+                    fit: BoxFit.cover),
               ),
-            ],
-          ),
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(30),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      labelText: "Search",
+                      hintText: "Search",
+                      prefixIcon: Icon(Icons.search),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          searchController.clear();
+                          setState(() {
+                            students = refreshStudents(true);
+                          });
+                        },
+                        icon: Icon(Icons.clear),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                      ),
+                    ),
+                    onChanged: (v) {
+                      v = v.toLowerCase();
+                      setState(() {
+                        students = refreshStudents(true).then((studentList) {
+                          final filteredSet = studentList
+                              .where((s) =>
+                                  s.name.toLowerCase().contains(v) ||
+                                  s.id.toLowerCase().contains(v) ||
+                                  s.room.toString().contains(v))
+                              .toSet();
+                          return filteredSet.toList();
+                        });
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ),
+            if (isMainPage) _buildDefaultView() else _buildHostelView(),
+          ],
         ),
       ),
       floatingActionButton: isMainPage
@@ -64,53 +108,55 @@ class _StudentsPageState extends State<StudentsPage> {
     );
   }
 
-  // ignore: unused_element
   Widget _buildDefaultView() {
     return FutureBuilder<List<Student>>(
       future: students,
-      builder: (context, snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List<Student>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return ListView.builder(
-            itemCount: 5,
-            itemBuilder: (context, index) {
-              return CardLoading(
-                  height: 120, child: linearStudentCard(Student.empty()));
-            },
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return CardLoading(
+                    height: 120, child: linearStudentCard(Student.empty()));
+              },
+              childCount: 5,
+            ),
           );
         } else if (snapshot.hasError) {
-          debugPrintStack();
-          return Text('Error: ${snapshot.error}');
+          return SliverToBoxAdapter(child: Text('Error: ${snapshot.error}'));
         } else {
-          final students = snapshot.data!;
-          return ListView.builder(
-            itemCount: students.length,
-            itemBuilder: (context, index) {
-              return linearStudentCard(students[index]);
-            },
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return linearStudentCard(snapshot.data![index]);
+              },
+              childCount: snapshot.data!.length,
+            ),
           );
         }
       },
     );
   }
 
-  // ignore: unused_element
   Widget _buildHostelView() {
     return FutureBuilder<List<Student>>(
       future: students,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return GridView.builder(
+          return SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: MediaQuery.of(context).size.width ~/ 160),
-            itemCount: 30,
-            itemBuilder: (context, index) {
-              return CardLoading(
-                  height: 120, child: verticalStudentCard(Student.empty()));
-            },
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return CardLoading(
+                    height: 120, child: verticalStudentCard(Student.empty()));
+              },
+              childCount: 30,
+            ),
           );
         } else if (snapshot.hasError) {
           debugPrintStack();
-          return Text('Error: ${snapshot.error}');
+          return SliverToBoxAdapter(child: Text('Error: ${snapshot.error}'));
         } else {
           final students = snapshot.data!;
 
@@ -124,13 +170,15 @@ class _StudentsPageState extends State<StudentsPage> {
             }
           }
 
-          return GridView.builder(
+          return SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: MediaQuery.of(context).size.width ~/ 160),
-            itemCount: students.length,
-            itemBuilder: (context, index) {
-              return verticalStudentCard(students[index]);
-            },
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return verticalStudentCard(students[index]);
+              },
+              childCount: students.length,
+            ),
           );
         }
       },
@@ -160,8 +208,8 @@ class _StudentsPageState extends State<StudentsPage> {
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: RandomPersonIcon(size: 72, color: Colors.black,)),
+                  padding: const EdgeInsets.all(8.0),
+                  child: RandomPersonIcon(size: 72, color: Colors.black)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

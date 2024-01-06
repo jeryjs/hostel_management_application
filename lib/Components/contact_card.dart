@@ -25,7 +25,7 @@ class ContactCardDialog extends StatelessWidget {
                 student.toColor().withAlpha(50)
               ]),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0,),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -61,7 +61,7 @@ class ContactCardDialog extends StatelessWidget {
               children: [
                 Ink(
                   decoration: const ShapeDecoration(
-                      color: Colors.green, shape: CircleBorder()),
+                      color: Colors.lightBlue, shape: CircleBorder()),
                   child: IconButton(
                     onPressed: () => launchUrlString('tel:${student.contact}'),
                     icon: const Icon(Icons.phone),
@@ -70,10 +70,29 @@ class ContactCardDialog extends StatelessWidget {
                 const SizedBox(width: 16.0),
                 Ink(
                   decoration: const ShapeDecoration(
-                      color: Colors.blue, shape: CircleBorder()),
+                      color: Colors.orange, shape: CircleBorder()),
                   child: IconButton(
                     onPressed: () => launchUrlString('mailto:${student.email}'),
                     icon: const Icon(Icons.email),
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                Ink(
+                  decoration: const ShapeDecoration(
+                      color: Colors.red, shape: CircleBorder()),
+                  child: IconButton(
+                    onPressed: () => launchUrlString('sms:${student.contact}'),
+                    icon: const Icon(Icons.sms),
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                Ink(
+                  decoration: const ShapeDecoration(
+                      color: Colors.green, shape: CircleBorder()),
+                  child: IconButton(
+                    onPressed: () =>
+                        launchUrlString('https://wa.me/91${student.contact}'),
+                    icon: const Icon(Icons.message),
                   ),
                 ),
               ],
