@@ -102,4 +102,13 @@ class Student {
   int _parseFloor() {
     return int.parse(room.toString().substring(0,1));
   }
+
+  /// Returns the color associated with the gender of the student.
+  Color getGenderColor() {
+    if (gender == 'male') {
+      return Colors.blue;
+    } else {
+      return Colors.pink;
+    }
+  }
 }

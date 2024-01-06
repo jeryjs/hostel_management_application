@@ -12,14 +12,6 @@ class ContactCardDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color getAvatarBackgroundColor() {
-      if (student.gender == 'male') {
-        return Colors.blue.withOpacity(0.2);
-      } else {
-        return Colors.pink.withOpacity(0.2);
-      }
-    }
-
     return Dialog(
       elevation: 8,
       child: Container(
@@ -46,8 +38,8 @@ class ContactCardDialog extends StatelessWidget {
             ),
             CircleAvatar(
               radius: 75,
-              backgroundColor: getAvatarBackgroundColor(),
-              child: RandomPersonIcon(size: 120),
+              backgroundColor: student.getGenderColor().withOpacity(0.2),
+              child: const RandomPersonIcon(size: 120),
             ),
             const SizedBox(height: 16.0),
             Text(

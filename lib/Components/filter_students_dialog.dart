@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:flutter/material.dart';
 
 class FilterOptionsDialog extends StatefulWidget {
@@ -33,20 +31,20 @@ class _FilterOptionsDialogState extends State<FilterOptionsDialog> {
             child: Container(
               width: 35,
               height: 5,
-              decoration: BoxDecoration(color: Colors.grey),
+              decoration: const BoxDecoration(color: Colors.grey),
             ),
           ),
         ),
-        SizedBox(height: 12),
-        Icon(Icons.filter_alt_outlined, size: 35),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        const SizedBox(height: 12),
+        const Icon(Icons.filter_alt_outlined, size: 35),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Text(
             'Filter Students',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
           ),
         ),
-        Text('Select the filters you want to apply'),
+        const Text('Select the filters you want to apply'),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Container(
@@ -78,7 +76,7 @@ class _FilterOptionsDialogState extends State<FilterOptionsDialog> {
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
 
                 // Floor Number
                 Text(_filterOptions.keys.elementAt(1),
@@ -102,7 +100,7 @@ class _FilterOptionsDialogState extends State<FilterOptionsDialog> {
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
 
                 // Gender
                 Text(_filterOptions.keys.elementAt(2),
@@ -127,20 +125,20 @@ class _FilterOptionsDialogState extends State<FilterOptionsDialog> {
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
 
                 // Clear All btn
                 Align(
                   alignment: Alignment.bottomRight,
                   child: ActionChip(
-                    avatar: Icon(Icons.clear),
+                    avatar: const Icon(Icons.clear),
                     onPressed: () {
                       setState(() {
                         _selections.fillRange(0, _selections.length, false);
                         widget.onSelectionChanged(_selections);
                       });
                     },
-                    label: Text('Clear All'),
+                    label: const Text('Clear All'),
                     backgroundColor: clr.tertiaryContainer,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
