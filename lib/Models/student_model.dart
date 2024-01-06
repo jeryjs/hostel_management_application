@@ -8,6 +8,7 @@ class Student {
   String name;
   int contact;
   String email;
+  String gender;
   DocumentReference hostel;
   int room;
   String id;
@@ -17,11 +18,12 @@ class Student {
 
   /// Constructs a new instance of the [Student] class.
   ///
-  /// The [name], [contact], [email], [hostel], and [id] parameters are required.
+  /// The [name], [contact], [email], [gender], [hostel], [room], and [id] parameters are required.
   Student({
     required this.name,
     required this.contact,
     required this.email,
+    required this.gender,
     required this.hostel,
     required this.room,
     required this.id,
@@ -35,6 +37,7 @@ class Student {
       name: json['name'],
       contact: json['contact'],
       email: json['email'],
+      gender: json['gender'],
       hostel: json['hostel'],
       room: json['room'],
       id: json['id'],
@@ -46,6 +49,7 @@ class Student {
       name: '',
       contact: 0,
       email: '',
+      gender: '',
       hostel: FirebaseFirestore.instance.collection('Hostels').doc('Karakoram'),
       room: 0,
       id: '',
@@ -60,6 +64,7 @@ class Student {
       'name': name,
       'contact': contact,
       'email': email,
+      'gender': gender,
       'hostel': hostel,
       'room': room,
       'id': id,

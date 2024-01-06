@@ -6,6 +6,7 @@ import 'package:hostel_management_application/Components/contact_card.dart';
 import 'package:hostel_management_application/Components/random_person_icon.dart';
 
 import '../Components/edit_student_dialog.dart';
+import '../Components/filter_students_dialog.dart';
 import '../Models/hostel_model.dart';
 import '../Models/student_model.dart';
 import '../database.dart';
@@ -23,7 +24,7 @@ class _StudentsPageState extends State<StudentsPage> {
   final DatabaseService dbService = DatabaseService();
   final searchController = TextEditingController();
   late Future<List<Student>> students = refreshStudents();
-  List<Student> filteredStudents = [];
+  final List<bool> _filterOpts = List.generate(10, (_) => false);
 
   Future<List<Student>> refreshStudents([bool getFromCache = false]) {
     if (widget.hostel != null) {
@@ -64,14 +65,57 @@ class _StudentsPageState extends State<StudentsPage> {
                       labelText: "Search",
                       hintText: "Search",
                       prefixIcon: Icon(Icons.search),
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          searchController.clear();
-                          setState(() {
-                            students = refreshStudents(true);
-                          });
-                        },
-                        icon: Icon(Icons.clear),
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return FilterOptionsDialog(
+                                    selections: _filterOpts,
+                                    onSelectionChanged: (opts) {
+                                      students = refreshStudents(true)
+                                          .then((studentList) {
+                                        List<Student> filtered = List.empty();
+                                        filtered += studentList
+                                            .where((s) =>
+                                                opts[0] && s.year == 2021 ||
+                                                opts[1] && s.year == 2022 ||
+                                                opts[2] && s.year == 2023 ||
+                                                opts[3] && s.year == 2024 ||
+                                                opts[4] && s.floor == 1 ||
+                                                opts[5] && s.floor == 2 ||
+                                                opts[6] && s.floor == 3 ||
+                                                opts[7] && s.gender == 'male' ||
+                                                opts[8] && s.gender == 'female')
+                                            .toSet()
+                                            .toList();
+                                        return filtered;
+                                      });
+                                      setState(() {
+                                        students = opts.contains(true)
+                                            ? students
+                                            : refreshStudents(true);
+                                      });
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            icon: Icon(Icons.filter_list_alt),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              searchController.clear();
+                              setState(() {
+                                students = refreshStudents(true);
+                              });
+                            },
+                            icon: Icon(Icons.clear),
+                          ),
+                        ],
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(25.0)),
