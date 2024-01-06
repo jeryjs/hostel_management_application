@@ -60,49 +60,7 @@ class _StudentsPageState extends State<StudentsPage> {
               ),
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(30),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      labelText: "Search",
-                      hintText: "Search",
-                      prefixIcon: Icon(Icons.search),
-                      suffixIcon: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                              onPressed: () => showFilterDialog(context),
-                              icon: Icon(Icons.filter_list_alt)),
-                          IconButton(
-                            onPressed: () {
-                              searchController.clear();
-                              setState(() => students = refreshStudents(true));
-                            },
-                            icon: Icon(Icons.clear),
-                          ),
-                        ],
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                      ),
-                    ),
-                    onChanged: (v) {
-                      v = v.toLowerCase();
-                      setState(() {
-                        students = refreshStudents(true).then((studentList) {
-                          final filteredSet = studentList
-                              .where((s) =>
-                                  s.name.toLowerCase().contains(v) ||
-                                  s.id.toLowerCase().contains(v) ||
-                                  s.room.toString().contains(v))
-                              .toSet();
-                          return filteredSet.toList();
-                        });
-                      });
-                    },
-                  ),
-                ),
+                child: searchBar(context),
               ),
             ),
             if (isMainPage) _buildDefaultView() else _buildHostelView(),
@@ -115,6 +73,54 @@ class _StudentsPageState extends State<StudentsPage> {
               child: const Icon(Icons.format_list_bulleted_add),
             )
           : null,
+    );
+  }
+
+  Padding searchBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextField(
+        controller: searchController,
+        decoration: InputDecoration(
+          labelText: "Search",
+          hintText: "Search",
+          prefixIcon: Icon(Icons.search),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                  onPressed: () => showFilterDialog(context),
+                  icon: Icon(Icons.filter_list_alt)),
+              IconButton(
+                onPressed: () {
+                  searchController.clear();
+                  setState(() {
+                    students = refreshStudents(true);
+                  });
+                },
+                icon: Icon(Icons.clear),
+              ),
+            ],
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(25.0)),
+          ),
+        ),
+        onChanged: (v) {
+          v = v.toLowerCase();
+          setState(() {
+            students = refreshStudents(true).then((studentList) {
+              final filteredSet = studentList
+                  .where((s) =>
+                      s.name.toLowerCase().contains(v) ||
+                      s.id.toLowerCase().contains(v) ||
+                      s.room.toString().contains(v))
+                  .toSet();
+              return filteredSet.toList();
+            });
+          });
+        },
+      ),
     );
   }
 
@@ -347,7 +353,8 @@ class _StudentsPageState extends State<StudentsPage> {
                       ),
                       IconButton(
                         onPressed: () => launchUrlString('tel:${s.contact}'),
-                        icon: Icon(Icons.phone_forwarded_outlined, size: h * 0.13),
+                        icon: Icon(Icons.phone_forwarded_outlined,
+                            size: h * 0.13),
                         tooltip: 'call',
                       ),
                     ],
