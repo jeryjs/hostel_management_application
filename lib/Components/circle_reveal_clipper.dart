@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 /// A custom clipper that creates a circular reveal effect.
@@ -14,11 +16,7 @@ class CircleRevealClipper extends CustomClipper<Path> {
 
   @override
   Path getClip(Size size) {
-    return Path()
-      ..addOval(Rect.fromCircle(
-        radius: radius, center: center
-      )
-    );
+    return Path()..addOval(Rect.fromCircle(radius: radius, center: center));
   }
 
   @override
@@ -42,8 +40,12 @@ PageRouteBuilder transitionPageRoute(Widget screen) {
       var screenSize = MediaQuery.of(context).size;
       return ClipPath(
         clipper: CircleRevealClipper(
-          radius: animation.drive(Tween(begin: 0.0, end: screenSize.height * 2.5)).value,
-          center: Offset(screenSize.width/1.1, screenSize.height / 2),
+          radius: animation
+              .drive(Tween(
+                  begin: 0.0,
+                  end: max(screenSize.width * 1.5, screenSize.height * 1)))
+              .value,
+          center: Offset(screenSize.width / 1.1, screenSize.height / 2),
         ),
         child: child,
       );
