@@ -109,6 +109,7 @@ class _StudentsPageState extends State<StudentsPage> {
         onChanged: (v) {
           v = v.toLowerCase();
           setState(() {
+            _filterOpts.fillRange(0, _filterOpts.length, false);
             students = refreshStudents(true).then((studentList) {
               final filteredSet = studentList
                   .where((s) =>
@@ -131,7 +132,7 @@ class _StudentsPageState extends State<StudentsPage> {
         return FilterOptionsDialog(
           selections: _filterOpts,
           onSelectionChanged: (opts) {
-            students = refreshStudents(true).then((studentList) {
+            students = students.then((studentList) {
               List<Student> filtered = List.empty();
               filtered += studentList
                   .where((s) =>
