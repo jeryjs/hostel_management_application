@@ -23,40 +23,52 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Center(
         child: RefreshIndicator.adaptive(
-          onRefresh: () async => setState(() {
-            hostels = dbService.getHostels();
-          }),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset('assets/images/hostels_banner.webp',
-                  height: 200, fit: BoxFit.cover),
-              const SizedBox(height: 48),
-              Expanded(
-                child: FutureBuilder<List<Hostel>>(
-                  future: hostels,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return ListView.builder(
-                        itemCount: 3,
-                        itemBuilder: (context, index) {
+          onRefresh: () async {
+            setState(() {
+              hostels = dbService.getHostels();
+            });
+          },
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 210,
+                floating: false,
+                pinned: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Image.asset('assets/images/hostels_banner.webp',
+                      fit: BoxFit.cover),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 48)),
+              FutureBuilder<List<Hostel>>(
+                future: hostels,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
                           return CardLoading(
                               height: 160, child: hostelCard(Hostel.empty()));
                         },
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      final hostels = snapshot.data!;
-                      return ListView.builder(
-                        itemCount: hostels.length,
-                        itemBuilder: (context, index) {
+                        childCount: 3,
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return SliverToBoxAdapter(
+                      child: Text('Error: ${snapshot.error}'),
+                    );
+                  } else {
+                    final hostels = snapshot.data!;
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
                           return hostelCard(hostels[index]);
                         },
-                      );
-                    }
-                  },
-                ),
+                        childCount: hostels.length,
+                      ),
+                    );
+                  }
+                },
               ),
             ],
           ),
@@ -86,7 +98,8 @@ class _HomePageState extends State<HomePage> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(40),
                   child: FancyShimmerImage(
-                      width: 100, height: 100,
+                      width: 100,
+                      height: 100,
                       imageUrl: h.imageUrl,
                       errorWidget: const CardLoading(height: 100)),
                 ),
