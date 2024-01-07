@@ -115,7 +115,7 @@ showEditStudentDialog(BuildContext context, [Student? student]) async {
                       content: SizedBox(
                           height: 32,
                           width: 32,
-                          child: CircularProgressIndicator()),
+                          child: Center(child: CircularProgressIndicator())),
                     );
                   },
                 );

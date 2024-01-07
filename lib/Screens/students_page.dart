@@ -352,7 +352,7 @@ class _StudentsPageState extends State<StudentsPage> {
                         tooltip: 'Edit',
                       ),
                       IconButton(
-                        onPressed: () => launchUrlString('tel:${s.contact}'),
+                        onPressed: () => launchUrlString('tel:+91${s.contact}'),
                         icon: Icon(Icons.phone_forwarded_outlined,
                             size: h * 0.13),
                         tooltip: 'call',

@@ -96,7 +96,7 @@ class _ContactCardDialogState extends State<ContactCardDialog> with TickerProvid
                   decoration: const ShapeDecoration(
                       color: Colors.lightBlue, shape: CircleBorder()),
                   child: IconButton(
-                    onPressed: () => launchUrlString('tel:${student.contact}'),
+                    onPressed: () => launchUrlString('tel:91${student.contact}'),
                     icon: const Icon(Icons.phone),
                   ),
                 ),
@@ -114,7 +114,7 @@ class _ContactCardDialogState extends State<ContactCardDialog> with TickerProvid
                   decoration: const ShapeDecoration(
                       color: Colors.red, shape: CircleBorder()),
                   child: IconButton(
-                    onPressed: () => launchUrlString('sms:${student.contact}'),
+                    onPressed: () => launchUrlString('sms:91${student.contact}'),
                     icon: const Icon(Icons.sms),
                   ),
                 ),
