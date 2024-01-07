@@ -399,10 +399,11 @@ class _StudentsPageState extends State<StudentsPage> {
   }
 
   Widget buildRoomCard(List<Student> l) {
-    final clr = Theme.of(context).colorScheme;
     final scr = MediaQuery.sizeOf(context);
     return Card(
-      child: Container(
+      shadowColor: l[0].toColor(),
+      elevation: 1.5,
+      child: SizedBox(
         height: max(150, scr.width * 0.2),
         // color: Colors.amber[200],
         child: Row(
