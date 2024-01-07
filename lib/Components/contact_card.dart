@@ -5,10 +5,42 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../Models/student_model.dart';
 import 'edit_student_dialog.dart';
 
-class ContactCardDialog extends StatelessWidget {
+class ContactCardDialog extends StatefulWidget {
   final Student student;
 
-  const ContactCardDialog({Key? key, required this.student}) : super(key: key);
+  const ContactCardDialog({super.key, required this.student});
+
+  @override
+  State<ContactCardDialog> createState() => _ContactCardDialogState();
+}
+
+class _ContactCardDialogState extends State<ContactCardDialog> with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late Student student = widget.student;
+  bool showListBody = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      setState(() {
+        showListBody = true;
+      });
+      _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,29 +131,37 @@ class ContactCardDialog extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16.0),
-            ListBody(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.phone),
-                  title: const Text('Phone'),
-                  subtitle: Text(student.contact.toString()),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.email),
-                  title: const Text('Email'),
-                  subtitle: Text(student.email),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.bed),
-                  title: const Text('Room Number'),
-                  subtitle: Text(student.room.toString()),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.home),
-                  title: const Text('Hostel Name'),
-                  subtitle: Text(student.hostel.id),
-                ),
-              ],
+            SizeTransition(
+              sizeFactor: CurvedAnimation(
+                parent: _controller,
+                curve: Curves.easeInOut,
+              ),
+              child: !showListBody
+                  ? const SizedBox()
+                  : ListBody(
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.phone),
+                          title: const Text('Phone'),
+                          subtitle: Text(student.contact.toString()),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.email),
+                          title: const Text('Email'),
+                          subtitle: Text(student.email),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.bed),
+                          title: const Text('Room Number'),
+                          subtitle: Text(student.room.toString()),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.home),
+                          title: const Text('Hostel Name'),
+                          subtitle: Text(student.hostel.id),
+                        ),
+                      ],
+                    ),
             ),
           ],
         ),
